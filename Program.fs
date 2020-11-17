@@ -4,25 +4,22 @@ open System.IO
 open CommonTypes
 open adventofcode20.Resolver
 
-let createPuzzleResolver day : SolvePuzzle option =
+let solveFor day : SolvePuzzle option =
     match day with
     | 1 -> Some DayOne.solve
     | _ -> None
 
 let solvePuzzle (puzzle: DailyPuzzle) =
-    let solveOption = createPuzzleResolver puzzle.Day
-    match solveOption with
+    match solveFor puzzle.Day with
     | Some solve -> solve puzzle
-    | None -> {
-            Puzzle = puzzle
-            Solution = "no solve function defined"
-        }
+    | None ->  "no solve function defined"
 
-let dailyLines (day: int) =
-    let path = sprintf "input/day%i.txt" day
-    match File.Exists path with
-    | true -> Ok (File.ReadLines path |> Seq.toArray)
-    | false -> Error (sprintf "Input file %s does not exist" path)
+let inputFor day = sprintf "input/day%i.txt" day
+
+let readLines (file: string) =
+    match File.Exists file with
+    | true -> Ok (File.ReadLines file |> Seq.toArray)
+    | false -> Error (sprintf "Input file %s does not exist" file)
 
 [<EntryPoint>]
 let main argv =
@@ -31,10 +28,8 @@ let main argv =
         | _ ->
             let day = argv.[0] |> int
             printfn "-- DAY %i --" day
-            let linesOption = dailyLines day
-            match linesOption with
-            | Ok lines ->
-                let solved = solvePuzzle { Day = day; Lines = lines }
-                printfn "%s" solved.Solution
-            | Error txt -> printfn "ERROR: %s" txt
+            match inputFor day |> readLines with
+            | Ok lines -> solvePuzzle { Day = day; Lines = lines }
+            | Error txt -> sprintf "ERROR: %s" txt
+            |> printfn "%s"
     0

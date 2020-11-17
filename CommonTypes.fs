@@ -5,9 +5,4 @@ type DailyPuzzle = {
     Lines: string []
 }
 
-type SolvedPuzzle = {
-    Puzzle: DailyPuzzle
-    Solution: string
-}
-
-type SolvePuzzle = DailyPuzzle -> SolvedPuzzle
+type SolvePuzzle = DailyPuzzle -> string
