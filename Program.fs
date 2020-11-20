@@ -21,15 +21,19 @@ let readLines (file: string) =
     | true -> Ok (File.ReadLines file |> Seq.toArray)
     | false -> Error (sprintf "Input file %s does not exist" file)
 
+let readDayPart (args: string []) =
+    match args.Length with
+    | 1 -> (args.[0] |> int, 1)
+    | 2 -> (args.[0] |> int, args.[1] |> int)
+    | _ -> (1, 1)
+
+
 [<EntryPoint>]
 let main argv =
-    match argv.Length with
-        0 -> printfn "Please provide a day"
-        | _ ->
-            let day = argv.[0] |> int
-            printfn "-- DAY %i --" day
-            match inputFor day |> readLines with
-            | Ok lines -> solvePuzzle { Day = day; Lines = lines }
-            | Error txt -> sprintf "ERROR: %s" txt
-            |> printfn "%s"
+    let (day, part) = readDayPart argv
+    printfn "-- DAY %i | PART %i --" day part
+    match inputFor day |> readLines with
+    | Ok lines -> solvePuzzle { Day = day; Part = part; Lines = lines }
+    | Error txt -> sprintf "ERROR: %s" txt
+    |> printfn "%s"
     0

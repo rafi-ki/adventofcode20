@@ -2,6 +2,7 @@
 
 type DailyPuzzle = {
     Day: int
+    Part: int
     Lines: string []
 }
 

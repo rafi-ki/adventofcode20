@@ -2,5 +2,4 @@
 
 module DayOne =
     open CommonTypes
-    let solve : SolvePuzzle = fun (puzzle) ->
-          sprintf "There are %i lines" puzzle.Lines.Length
+    let solve puzzle = puzzle.Lines |> String.concat "\n"
