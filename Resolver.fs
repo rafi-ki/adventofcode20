@@ -2,4 +2,12 @@
 
 module DayOne =
     open CommonTypes
-    let solve puzzle = puzzle.Lines |> String.concat "\n"
+
+    let calculateFuel (mass: int) =
+        mass ./. 3 |> floor |> int |> fun x -> x - 2
+
+    let solve puzzle =
+        puzzle.Lines
+        |> Array.map (fun x -> x |> int |> calculateFuel)
+        |> Array.sum
+        |> string

@@ -7,3 +7,5 @@ type DailyPuzzle = {
 }
 
 type SolvePuzzle = DailyPuzzle -> string
+
+let (./.) x y = (x |> double) / (y |> double)
