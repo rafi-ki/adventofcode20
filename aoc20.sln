@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "adventofcode20", "adventofcode\adventofcode20.fsproj", "{CA19C617-E529-473A-A938-5AE5D11A58CB}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "test", "test\test.fsproj", "{B2028FE5-7999-4AF4-93B4-4358DF9BD7BB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{CA19C617-E529-473A-A938-5AE5D11A58CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CA19C617-E529-473A-A938-5AE5D11A58CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CA19C617-E529-473A-A938-5AE5D11A58CB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B2028FE5-7999-4AF4-93B4-4358DF9BD7BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B2028FE5-7999-4AF4-93B4-4358DF9BD7BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B2028FE5-7999-4AF4-93B4-4358DF9BD7BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B2028FE5-7999-4AF4-93B4-4358DF9BD7BB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
