@@ -9,7 +9,7 @@ open Resolver
 module DayOne =
 
     [<Fact>]
-    let ``solve given example part one``() =
+    let ``solve example part one``() =
         let puzzle = {
             Day = 1
             Part = 1
@@ -19,7 +19,7 @@ module DayOne =
         Assert.Equal("514579", result)
 
     [<Fact>]
-    let ``solve given example part two``() =
+    let ``solve example part two``() =
         let puzzle = {
             Day = 1
             Part = 2
