@@ -21,3 +21,16 @@ module DayOne =
     let solve puzzle =
         let solve = if puzzle.Part = 1 then solve1 else solve2
         puzzle.Lines |> Array.map int |> solve
+
+module DayTwo =
+    open CommonTypes
+
+    let solve1 lines =
+        "solve1"
+
+    let solve2 lines =
+        "solve2"
+
+    let solve puzzle =
+        let solve = if puzzle.Part = 1 then solve1 else solve2
+        puzzle.Lines |> Array.map int |> solve
