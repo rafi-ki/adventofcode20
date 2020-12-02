@@ -25,12 +25,40 @@ module DayOne =
 module DayTwo =
     open CommonTypes
 
-    let solve1 lines =
-        "solve1"
+    type PwdPolicy = {
+        First: int
+        Second: int
+        Letter: char
+        Password: string
+    }
 
-    let solve2 lines =
-        "solve2"
+    let private parseLine (line: string) =
+        let split = line.Split " "
+        let range = split.[0].Split "-"
+        {
+            First = int range.[0]
+            Second = int range.[1]
+            Letter = split.[1].Substring(0, 1) |> char
+            Password = split.[2]
+        }
+
+    let private isValid (line: PwdPolicy) =
+        let countAppearance x = Seq.filter ((=) x) >> Seq.length
+        let count = countAppearance line.Letter line.Password
+        count >= line.First && count <= line.Second
+
+    let private isValid2 (line: PwdPolicy) =
+        let matchesFirst = line.Password.[line.First - 1] = line.Letter
+        let matchesSecond = line.Password.[line.Second - 1] = line.Letter
+        (matchesFirst && not matchesSecond) || (matchesSecond && not matchesFirst)
+
+    let private solve1 policies =
+        policies |> Array.filter isValid |> Array.length
+
+    let private solve2 policies =
+        policies |> Array.filter isValid2 |> Array.length
 
     let solve puzzle =
         let solve = if puzzle.Part = 1 then solve1 else solve2
-        puzzle.Lines |> Array.map int |> solve
+        let policies = puzzle.Lines |> Array.map parseLine
+        solve policies |> string

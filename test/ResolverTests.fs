@@ -1,4 +1,4 @@
-module Tests
+module ResolverTests
 
 open Xunit
 open CommonTypes
@@ -35,17 +35,17 @@ module DayTwo =
         let puzzle = {
             Day = 2
             Part = 1
-            Lines = [|"1721";"979";"366";"299";"675";"1456"|]
+            Lines = [|"1-3 a: abcde";"1-3 b: cdefg";"2-9 c: ccccccccc"|]
         }
         let result = DayTwo.solve puzzle
-        Assert.Equal("solve1", result)
+        Assert.Equal("2", result)
 
     [<Fact>]
     let ``solve example part two``() =
         let puzzle = {
             Day = 2
             Part = 2
-            Lines = [|"1721";"979";"366";"299";"675";"1456"|]
+            Lines = [|"1-3 a: abcde";"1-3 b: cdefg";"2-9 c: ccccccccc"|]
         }
         let result = DayTwo.solve puzzle
-        Assert.Equal("solve2", result)
+        Assert.Equal("1", result)
