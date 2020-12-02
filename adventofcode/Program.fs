@@ -7,7 +7,9 @@ open adventofcode20.Resolver
 let solveFor day : SolvePuzzle option =
     match day with
     | 1 -> Some DayOne.solve
-    | _ -> Some DayTwo.solve
+    | 2 -> Some DayTwo.solve
+    | 3 -> Some DayThree.solve
+    | _ -> None
 
 let solvePuzzle (puzzle: DailyPuzzle) =
     match solveFor puzzle.Day with

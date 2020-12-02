@@ -62,3 +62,9 @@ module DayTwo =
         let isValid = if puzzle.Part = 1 then isValid else isValid2
         let policies = puzzle.Lines |> Array.map parseLine
         policies |> Array.filter isValid |> Array.length |> string
+
+module DayThree =
+    open CommonTypes
+
+    let solve puzzle =
+        if puzzle.Part = 1 then "1" else "2"
