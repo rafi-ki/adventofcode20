@@ -45,10 +45,11 @@ module DayTwo =
         }
         (pwdPolicy, split.[2])
 
+    let private countChar c = Seq.filter ((=) c) >> Seq.length
+
     let private isValid (line: ParsedLine) =
         let pwdPolicy, pwd = line
-        let countAppearance x = Seq.filter ((=) x) >> Seq.length
-        let count = countAppearance pwdPolicy.Letter pwd
+        let count = countChar pwdPolicy.Letter pwd
         count >= pwdPolicy.First && count <= pwdPolicy.Second
 
     let private isValid2 (line: ParsedLine) =
