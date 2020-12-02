@@ -29,36 +29,35 @@ module DayTwo =
         First: int
         Second: int
         Letter: char
-        Password: string
     }
 
-    let private parseLine (line: string) =
+    type Pwd = string
+
+    type ParsedLine = PwdPolicy * Pwd
+
+    let private parseLine (line: string): ParsedLine =
         let split = line.Split " "
         let range = split.[0].Split "-"
-        {
+        let pwdPolicy = {
             First = int range.[0]
             Second = int range.[1]
             Letter = split.[1].Substring(0, 1) |> char
-            Password = split.[2]
         }
+        (pwdPolicy, split.[2])
 
-    let private isValid (line: PwdPolicy) =
+    let private isValid (line: ParsedLine) =
+        let pwdPolicy, pwd = line
         let countAppearance x = Seq.filter ((=) x) >> Seq.length
-        let count = countAppearance line.Letter line.Password
-        count >= line.First && count <= line.Second
+        let count = countAppearance pwdPolicy.Letter pwd
+        count >= pwdPolicy.First && count <= pwdPolicy.Second
 
-    let private isValid2 (line: PwdPolicy) =
-        let matchesFirst = line.Password.[line.First - 1] = line.Letter
-        let matchesSecond = line.Password.[line.Second - 1] = line.Letter
+    let private isValid2 (line: ParsedLine) =
+        let pwdPolicy, pwd = line
+        let matchesFirst = pwd.[pwdPolicy.First - 1] = pwdPolicy.Letter
+        let matchesSecond = pwd.[pwdPolicy.Second - 1] = pwdPolicy.Letter
         (matchesFirst && not matchesSecond) || (matchesSecond && not matchesFirst)
 
-    let private solve1 policies =
-        policies |> Array.filter isValid |> Array.length
-
-    let private solve2 policies =
-        policies |> Array.filter isValid2 |> Array.length
-
     let solve puzzle =
-        let solve = if puzzle.Part = 1 then solve1 else solve2
+        let isValid = if puzzle.Part = 1 then isValid else isValid2
         let policies = puzzle.Lines |> Array.map parseLine
-        solve policies |> string
+        policies |> Array.filter isValid |> Array.length |> string
