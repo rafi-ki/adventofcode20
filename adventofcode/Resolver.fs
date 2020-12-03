@@ -66,5 +66,38 @@ module DayTwo =
 module DayThree =
     open CommonTypes
 
+    type Coords = { X: int; Y: int }
+
+    type Collector = {
+        Field: string[]
+        Coords: Coords
+        Count: int
+    }
+
+    let private move collector =
+        let coords = collector.Coords
+        let movedCoords = { coords with X = coords.X + 3; Y = coords.Y + 1 }
+        { collector with Coords = movedCoords }
+
+    let private sitsOnTree collector =
+        let coords = collector.Coords
+        let line = collector.Field.[coords.Y]
+        line.[coords.X % line.Length] = '#'
+
+    let private collect collector =
+        let cnt = if sitsOnTree collector then 1 else 0
+        { collector with Count = collector.Count + cnt }
+
+    let private solve1 (lines: string[])  =
+        let collector = {
+            Field = lines
+            Coords = { X = 0; Y = 0 }
+            Count = 0
+        }
+        let work = collect >> move
+        let result = { 1..lines.Length }
+                        |> Seq.fold (fun next i -> work next) collector
+        result.Count |> string
+
     let solve puzzle =
-        if puzzle.Part = 1 then "1" else "2"
+        if puzzle.Part = 1 then solve1 puzzle.Lines else "2"

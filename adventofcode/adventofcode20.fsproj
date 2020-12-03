@@ -12,6 +12,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="input\day2.txt" />
+    <Content Include="input\day3.txt" />
     <Compile Include="Resolver.fs" />
     <Compile Include="Program.fs" />
     <Content Include=".gitignore" />
