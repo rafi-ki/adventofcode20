@@ -77,8 +77,18 @@ module DayThree =
         let puzzle = {
             Day = 3
             Part = 2
-            Lines = [|"1-3 a: abcde";"1-3 b: cdefg";"2-9 c: ccccccccc"|]
+            Lines = [|"..##.......";
+                      "#...#...#..";
+                      ".#....#..#.";
+                      "..#.#...#.#";
+                      ".#...##..#.";
+                      "..#.##.....";
+                      ".#.#.#....#";
+                      ".#........#";
+                      "#.##...#...";
+                      "#...##....#";
+                      ".#..#...#.#"|]
         }
         let result = DayThree.solve puzzle
-        Assert.Equal("2", result)
+        Assert.Equal("336", result)
 

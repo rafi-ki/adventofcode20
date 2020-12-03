@@ -74,15 +74,18 @@ module DayThree =
         Count: int
     }
 
-    let private move collector =
+    let private move x y collector =
         let coords = collector.Coords
-        let movedCoords = { coords with X = coords.X + 3; Y = coords.Y + 1 }
+        let movedCoords = { coords with X = coords.X + x; Y = coords.Y + y }
         { collector with Coords = movedCoords }
 
     let private sitsOnTree collector =
         let coords = collector.Coords
-        let line = collector.Field.[coords.Y]
-        line.[coords.X % line.Length] = '#'
+        if collector.Field.Length <= coords.Y
+        then false
+        else
+            let line = collector.Field.[coords.Y]
+            line.[coords.X % line.Length] = '#'
 
     let private collect collector =
         let cnt = if sitsOnTree collector then 1 else 0
@@ -94,10 +97,30 @@ module DayThree =
             Coords = { X = 0; Y = 0 }
             Count = 0
         }
-        let work = collect >> move
+        let work = collect >> move 3 1
         let result = { 1..lines.Length }
-                        |> Seq.fold (fun next i -> work next) collector
+                        |> Seq.fold (fun next _ -> work next) collector
         result.Count |> string
 
+    let private solve2move x y (lines: string[]) =
+        let collector = {
+            Field = lines
+            Coords = { X = 0; Y = 0 }
+            Count = 0
+        }
+        let work = collect >> move x y
+        let result = { 1..lines.Length }
+                        |> Seq.fold (fun next _ -> work next) collector
+        result.Count |> int64
+
+    let private solve2 (lines: string[]) =
+        let c1 = solve2move 1 1 lines
+        let c2 = solve2move 3 1 lines
+        let c3 = solve2move 5 1 lines
+        let c4 = solve2move 7 1 lines
+        let c5 = solve2move 1 2 lines
+        c1 * c2 * c3 * c4 * c5 |> string
+
     let solve puzzle =
-        if puzzle.Part = 1 then solve1 puzzle.Lines else "2"
+        let solve = if puzzle.Part = 1 then solve1 else solve2
+        solve puzzle.Lines
