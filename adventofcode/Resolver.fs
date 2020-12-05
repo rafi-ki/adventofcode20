@@ -1,6 +1,8 @@
 ﻿module adventofcode20.Resolver
 
+open System
 open System.Collections.Generic
+open System.Text.RegularExpressions
 
 module DayOne =
     open CommonTypes
@@ -170,8 +172,80 @@ module DayFour =
         else
             None
 
+    let (|Int|_|) str =
+       match System.Int32.TryParse(str:string) with
+       | (true,int) -> Some(int)
+       | _ -> None
+
+    let private validateBirthYear (pp: Passport) =
+        match pp.BirthYear >= 1920 && pp.BirthYear <= 2002 with
+        | true -> Ok pp
+        | false -> Error "BirthYea invalid"
+
+    let private validateIssueYear (pp: Passport) =
+        match pp.IssueYear >= 2010 && pp.IssueYear <= 2020 with
+        | true -> Ok pp
+        | false -> Error "IssueYear invalid"
+
+    let private validateExpirationYear (pp: Passport) =
+        match pp.ExpirationYear >= 2020 && pp.ExpirationYear <= 2030 with
+        | true -> Ok pp
+        | false -> Error "ExpirationYear invalid"
+
+    let private validateHeight (pp: Passport): Result<Passport, string> =
+        match pp.Height.Substring(pp.Height.Length-2, 2) with
+        | "cm" ->
+            let value = pp.Height.Substring(0, pp.Height.Length-2) |> int
+            if value >= 150 && value <= 193 then
+                Ok pp
+            else
+                Error "Height invalid"
+        | "in" ->
+            let value = pp.Height.Substring(0, pp.Height.Length-2) |> int
+            if value >= 59 && value <= 76 then
+                Ok pp
+            else
+                Error "Height invalid"
+        | _ -> Error "Height invalid"
+
+    let private validateHairColor (pp: Passport) =
+        let m = Regex.Match(pp.HairColor, "^#[a-f0-9]{6}")
+        match m.Success with
+        | true -> Ok pp
+        | false -> Error "HairColor invalid"
+
+    let private validateEyeColor (pp: Passport) =
+        let m = Regex.Match(pp.EyeColor, "^(?:amb|blu|brn|gry|grn|hzl|oth)$")
+        match m.Success with
+        | true -> Ok pp
+        | false -> Error "EyeColor invalid"
+
+    let private validateId (pp: Passport) =
+        let m = Regex.Match(pp.Id, "^[0-9]{9}$")
+        match m.Success with
+        | true -> Ok pp
+        | false -> Error "Id invalid"
+
+    let private validatePassport (pp: Passport): Result<Passport, string> =
+        Ok pp
+        |> Result.bind validateBirthYear
+        |> Result.bind validateIssueYear
+        |> Result.bind validateExpirationYear
+        |> Result.bind validateHeight
+        |> Result.bind validateHairColor
+        |> Result.bind validateEyeColor
+        |> Result.bind validateId
+
     let solve puzzle =
         let combined = puzzle.Lines |> String.concat " "
         let split = combined.Split "  "
-        let valid = split |> Array.map parsePassport |> Array.filter (fun x -> x.IsSome)
-        valid.Length |> string
+        let passports = split |> Array.map parsePassport |> Array.choose id
+        if puzzle.Part = 1 then
+            string passports.Length
+        else
+            let mapOk x = match x with | Ok pp -> Some pp | Error _ -> None
+            passports
+            |> Array.map validatePassport
+            |> Array.choose mapOk
+            |> Array.length
+            |> string
