@@ -172,11 +172,6 @@ module DayFour =
         else
             None
 
-    let (|Int|_|) str =
-       match System.Int32.TryParse(str:string) with
-       | (true,int) -> Some(int)
-       | _ -> None
-
     let private validateBirthYear (pp: Passport) =
         match pp.BirthYear >= 1920 && pp.BirthYear <= 2002 with
         | true -> Ok pp
@@ -249,3 +244,69 @@ module DayFour =
             |> Array.choose mapOk
             |> Array.length
             |> string
+
+module DayFive =
+    open CommonTypes
+
+    type Range = {
+        Low: int
+        High: int
+    }
+
+    type Seat = {
+        Row: int
+        Col: int
+    }
+
+    let takeUpper range =
+        let dif = ((range.High - range.Low) / 2) + 1
+        { Low = range.Low + dif; High = range.High }
+
+    let takeLower range =
+        let dif = ((range.High - range.Low) / 2) + 1
+        { Low = range.Low; High = range.High - dif }
+
+    let letterToUpDown x =
+        match x with
+        | 'F' -> takeLower
+        | 'B' -> takeUpper
+        | _ -> failwith "unknown"
+
+    let letterToRightLeft x =
+         match x with
+         | 'L' -> takeLower
+         | 'R' -> takeUpper
+         | _ -> failwith "unknown"
+
+    let row (line: string) =
+        let range = { Low = 0; High = 7 }
+        let fold =
+            line |> Seq.skip 7
+            |> Seq.map letterToRightLeft
+            |> Seq.reduce (>>)
+        (fold range).Low
+
+    let col (line: string) =
+        let range = { Low = 0; High = 127 }
+        let fold =
+            line |> Seq.take 7
+            |> Seq.map letterToUpDown
+            |> Seq.reduce (>>)
+        (fold range).Low
+
+    let seat (line: string) = { Row = row line; Col = col line }
+
+    let seatId (seat: Seat) = seat.Col * 8 + seat.Row
+
+    let seatIdForLine (line: string) = line |> seat |> seatId
+
+    let solve puzzle =
+        if puzzle.Part = 1 then
+            puzzle.Lines
+            |> Array.map seatIdForLine
+            |> Array.max
+            |> string
+        else
+            let seats = puzzle.Lines |> Array.map seat
+            "2"
+//            let rows
