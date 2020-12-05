@@ -1,5 +1,7 @@
 ﻿module adventofcode20.Resolver
 
+open System.Collections.Generic
+
 module DayOne =
     open CommonTypes
 
@@ -124,3 +126,52 @@ module DayThree =
     let solve puzzle =
         let solve = if puzzle.Part = 1 then solve1 else solve2
         solve puzzle.Lines
+
+module DayFour =
+    open CommonTypes
+
+    type Passport = {
+        Id: string
+        BirthYear: int
+        IssueYear: int
+        ExpirationYear: int
+        Height: string
+        HairColor: string
+        EyeColor: string
+        CountryId: string option
+    }
+
+    let private parsePassport (line: string) : Passport option =
+        let toKvPair (x: string) =
+            let split = x.Split ":"
+            KeyValuePair(split.[0], split.[1])
+        let kvPairs = line.Split " " |> Seq.map toKvPair
+
+        let byr = kvPairs |> Seq.tryFind (fun x -> x.Key = "byr")
+        let iyr = kvPairs |> Seq.tryFind (fun x -> x.Key = "iyr")
+        let eyr = kvPairs |> Seq.tryFind (fun x -> x.Key = "eyr")
+        let hgt = kvPairs |> Seq.tryFind (fun x -> x.Key = "hgt")
+        let hcl = kvPairs |> Seq.tryFind (fun x -> x.Key = "hcl")
+        let ecl = kvPairs |> Seq.tryFind (fun x -> x.Key = "ecl")
+        let id = kvPairs |> Seq.tryFind (fun x -> x.Key = "pid")
+        let cid = kvPairs |> Seq.tryFind (fun x -> x.Key = "cid")
+
+        if byr.IsSome && iyr.IsSome && eyr.IsSome && hgt.IsSome && hcl.IsSome && ecl.IsSome && id.IsSome then
+            {
+                Id = id.Value.Value
+                BirthYear = byr.Value.Value |> int
+                IssueYear = iyr.Value.Value |> int
+                ExpirationYear = eyr.Value.Value |> int
+                Height = hgt.Value.Value
+                HairColor = hcl.Value.Value
+                EyeColor = ecl.Value.Value
+                CountryId = cid |> Option.map (fun x -> x.Value) }
+            |> Some
+        else
+            None
+
+    let solve puzzle =
+        let combined = puzzle.Lines |> String.concat " "
+        let split = combined.Split "  "
+        let valid = split |> Array.map parsePassport |> Array.filter (fun x -> x.IsSome)
+        valid.Length |> string
