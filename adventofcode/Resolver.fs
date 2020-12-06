@@ -278,7 +278,7 @@ module DayFive =
          | 'R' -> takeUpper
          | _ -> failwith "unknown"
 
-    let row (line: string) =
+    let col (line: string) =
         let range = { Low = 0; High = 7 }
         let fold =
             line |> Seq.skip 7
@@ -286,7 +286,7 @@ module DayFive =
             |> Seq.reduce (>>)
         (fold range).Low
 
-    let col (line: string) =
+    let row (line: string) =
         let range = { Low = 0; High = 127 }
         let fold =
             line |> Seq.take 7
@@ -296,17 +296,28 @@ module DayFive =
 
     let seat (line: string) = { Row = row line; Col = col line }
 
-    let seatId (seat: Seat) = seat.Col * 8 + seat.Row
+    let seatId (seat: Seat) = seat.Row * 8 + seat.Col
 
-    let seatIdForLine (line: string) = line |> seat |> seatId
+    let allSeats =
+        let mutable result = []
+        for i in 0 .. 7 do
+            for j in 0 .. 127 do
+                result <-  { Row = j; Col = i } :: result
+        result
 
     let solve puzzle =
         if puzzle.Part = 1 then
             puzzle.Lines
-            |> Array.map seatIdForLine
+            |> Array.map (fun x -> x |> seat |> seatId)
             |> Array.max
             |> string
         else
-            let seats = puzzle.Lines |> Array.map seat
-            "2"
-//            let rows
+            let seatsOnPlane = puzzle.Lines |> Array.map seat |> List.ofArray
+            let notFirstOrLastRow x = x.Row > 0 && x.Row < 127
+            let remainingSeats =
+                allSeats
+                |> List.except seatsOnPlane
+                |> List.filter notFirstOrLastRow
+                |> List.map seatId
+                |> List.sort
+            remainingSeats.Length |> string

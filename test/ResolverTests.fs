@@ -165,7 +165,7 @@ module DayFive =
     let ``solve example part one``() =
         let puzzle = {
             Day = 5
-            Part = 1
+            Part = 2
             Lines = [|  "BFFFBBFRRR"
                         "FFFBBBFRRR"
                         "BBFFBBFRLL"|]
