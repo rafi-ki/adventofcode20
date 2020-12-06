@@ -258,6 +258,9 @@ module DayFive =
         Col: int
     }
 
+    let colRange = { Low = 0; High = 7 }
+    let rowRange = { Low = 0; High = 127 }
+
     let takeUpper range =
         let dif = ((range.High - range.Low) / 2) + 1
         { Low = range.Low + dif; High = range.High }
@@ -272,21 +275,16 @@ module DayFive =
         | 'B' | 'R' -> takeUpper
         | _ -> failwith "unknown"
 
-    let col (line: string) =
-        let range = { Low = 0; High = 7 }
+    let breakDown (letters: seq<char>) (range: Range) =
         let fold =
-            line |> Seq.skip 7
+            letters
             |> Seq.map letterToHalfDown
             |> Seq.reduce (>>)
         (fold range).Low
 
-    let row (line: string) =
-        let range = { Low = 0; High = 127 }
-        let fold =
-            line |> Seq.take 7
-            |> Seq.map letterToHalfDown
-            |> Seq.reduce (>>)
-        (fold range).Low
+    let col (line: string) = colRange |> breakDown (line |> Seq.skip 7)
+
+    let row (line: string) = rowRange |> breakDown (line |> Seq.take 7)
 
     let seat (line: string) = { Row = row line; Col = col line }
 
@@ -299,7 +297,9 @@ module DayFive =
     let solve puzzle =
         let seatIdsOnPlane = puzzle.Lines |> Array.map (seat >> seatId)
         if puzzle.Part = 1 then
-            seatIdsOnPlane |> Array.max |> string
+            seatIdsOnPlane
+            |> Array.max
+            |> string
         else
             let emptySeatIds = [|8 .. (127 * 8 - 1)|] |> Array.except seatIdsOnPlane
             emptySeatIds
@@ -326,8 +326,7 @@ module DaySix =
         let combined = lines |> String.concat " "
         let grouped = combined.Split "  "
         grouped
-        |> Array.map intersectionFor
-        |> Array.map (fun x -> x.Count)
+        |> Array.map (intersectionFor >> Set.count)
         |> Array.sum
         |> string
 
