@@ -321,3 +321,12 @@ module DayFive =
                 |> List.map seatId
                 |> List.sort
             remainingSeats.Length |> string
+
+module DaySix =
+    open CommonTypes
+
+    let solve puzzle =
+        let combined = puzzle.Lines |> String.concat " "
+        let grouped = combined.Split "  " |> Array.map (fun x -> x.Replace(" ", ""))
+        let distinct = grouped |> Array.map (fun x -> Seq.distinct x |> Array.ofSeq) |> Array.map Array.length
+        if puzzle.Part = 1 then distinct |> Array.sum |> string else "2"

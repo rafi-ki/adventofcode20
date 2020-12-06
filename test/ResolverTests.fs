@@ -172,3 +172,53 @@ module DayFive =
         }
         let result = DayFive.solve puzzle
         Assert.Equal("820", result)
+
+module DaySix =
+
+    [<Fact>]
+    let ``solve example part one``() =
+        let puzzle = {
+            Day = 6
+            Part = 1
+            Lines = [|  "abc"
+                        ""
+                        "a"
+                        "b"
+                        "c"
+                        ""
+                        "ab"
+                        "ac"
+                        ""
+                        "a"
+                        "a"
+                        "a"
+                        "a"
+                        ""
+                        "b"|]
+        }
+        let result = DaySix.solve puzzle
+        Assert.Equal("11", result)
+
+    [<Fact>]
+    let ``solve example part two``() =
+        let puzzle = {
+            Day = 6
+            Part = 2
+            Lines = [|  "abc"
+                        ""
+                        "a"
+                        "b"
+                        "c"
+                        ""
+                        "ab"
+                        "ac"
+                        ""
+                        "a"
+                        "a"
+                        "a"
+                        "a"
+                        ""
+                        "b"|]
+        }
+        let result = DaySix.solve puzzle
+        Assert.Equal("6", result)
