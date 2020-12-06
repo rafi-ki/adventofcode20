@@ -305,6 +305,10 @@ module DayFive =
                 result <-  { Row = j; Col = i } :: result
         result
 
+    let private specialSeatIdCheck id (seats: Set<int>) =
+        if seats.Contains id then false
+        else seats.Contains (id+1) && seats.Contains (id-1)
+
     let solve puzzle =
         if puzzle.Part = 1 then
             puzzle.Lines
@@ -312,15 +316,14 @@ module DayFive =
             |> Array.max
             |> string
         else
-            let seatsOnPlane = puzzle.Lines |> Array.map seat |> List.ofArray
-            let notFirstOrLastRow x = x.Row > 0 && x.Row < 127
-            let remainingSeats =
-                allSeats
-                |> List.except seatsOnPlane
-                |> List.filter notFirstOrLastRow
-                |> List.map seatId
-                |> List.sort
-            remainingSeats.Length |> string
+            let seatIdsOnPlane = puzzle.Lines |> Array.map (seat >> seatId) |> Set.ofArray
+            let leftSeatIds = [8 .. (127 * 8 - 1)]
+            leftSeatIds
+            |> List.map (fun id -> (specialSeatIdCheck id seatIdsOnPlane), id)
+            |> List.filter fst
+            |> List.map snd
+            |> List.head
+            |> string
 
 module DaySix =
     open CommonTypes
