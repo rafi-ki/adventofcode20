@@ -266,23 +266,17 @@ module DayFive =
         let dif = ((range.High - range.Low) / 2) + 1
         { Low = range.Low; High = range.High - dif }
 
-    let letterToUpDown x =
+    let letterToHalfDown x =
         match x with
-        | 'F' -> takeLower
-        | 'B' -> takeUpper
+        | 'F' | 'L' -> takeLower
+        | 'B' | 'R' -> takeUpper
         | _ -> failwith "unknown"
-
-    let letterToRightLeft x =
-         match x with
-         | 'L' -> takeLower
-         | 'R' -> takeUpper
-         | _ -> failwith "unknown"
 
     let col (line: string) =
         let range = { Low = 0; High = 7 }
         let fold =
             line |> Seq.skip 7
-            |> Seq.map letterToRightLeft
+            |> Seq.map letterToHalfDown
             |> Seq.reduce (>>)
         (fold range).Low
 
@@ -290,7 +284,7 @@ module DayFive =
         let range = { Low = 0; High = 127 }
         let fold =
             line |> Seq.take 7
-            |> Seq.map letterToUpDown
+            |> Seq.map letterToHalfDown
             |> Seq.reduce (>>)
         (fold range).Low
 
@@ -298,31 +292,18 @@ module DayFive =
 
     let seatId (seat: Seat) = seat.Row * 8 + seat.Col
 
-    let allSeats =
-        let mutable result = []
-        for i in 0 .. 7 do
-            for j in 0 .. 127 do
-                result <-  { Row = j; Col = i } :: result
-        result
-
-    let private specialSeatIdCheck id (seats: Set<int>) =
-        if seats.Contains id then false
-        else seats.Contains (id+1) && seats.Contains (id-1)
+    let private hasEmptyPrevAndNext id (idsOnPlane: int[]) =
+        let set = idsOnPlane |> Set.ofArray
+        set.Contains (id-1) && set.Contains (id+1)
 
     let solve puzzle =
+        let seatIdsOnPlane = puzzle.Lines |> Array.map (seat >> seatId)
         if puzzle.Part = 1 then
-            puzzle.Lines
-            |> Array.map (fun x -> x |> seat |> seatId)
-            |> Array.max
-            |> string
+            seatIdsOnPlane |> Array.max |> string
         else
-            let seatIdsOnPlane = puzzle.Lines |> Array.map (seat >> seatId) |> Set.ofArray
-            let leftSeatIds = [8 .. (127 * 8 - 1)]
-            leftSeatIds
-            |> List.map (fun id -> (specialSeatIdCheck id seatIdsOnPlane), id)
-            |> List.filter fst
-            |> List.map snd
-            |> List.head
+            let emptySeatIds = [|8 .. (127 * 8 - 1)|] |> Array.except seatIdsOnPlane
+            emptySeatIds
+            |> Array.find (fun x -> hasEmptyPrevAndNext x seatIdsOnPlane)
             |> string
 
 module DaySix =
