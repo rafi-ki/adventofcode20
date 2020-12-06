@@ -325,8 +325,28 @@ module DayFive =
 module DaySix =
     open CommonTypes
 
-    let solve puzzle =
-        let combined = puzzle.Lines |> String.concat " "
+    let solve1 lines =
+        let combined = lines |> String.concat " "
         let grouped = combined.Split "  " |> Array.map (fun x -> x.Replace(" ", ""))
-        let distinct = grouped |> Array.map (fun x -> Seq.distinct x |> Array.ofSeq) |> Array.map Array.length
-        if puzzle.Part = 1 then distinct |> Array.sum |> string else "2"
+        grouped
+        |> Array.map (fun x -> Seq.distinct x |> Array.ofSeq |> Array.length)
+        |> Array.sum
+        |> string
+
+    let intersectionFor (value: string) =
+        value.Split " "
+        |> Seq.map (fun x -> x.ToCharArray() |> Set.ofArray)
+        |> Seq.reduce Set.intersect
+
+    let solve2 lines =
+        let combined = lines |> String.concat " "
+        let grouped = combined.Split "  "
+        grouped
+        |> Array.map intersectionFor
+        |> Array.map (fun x -> x.Count)
+        |> Array.sum
+        |> string
+
+    let solve puzzle =
+        let solve = if puzzle.Part = 1 then solve1 else solve2
+        solve puzzle.Lines
