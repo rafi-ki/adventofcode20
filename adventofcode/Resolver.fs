@@ -333,3 +333,9 @@ module DaySix =
     let solve puzzle =
         let solve = if puzzle.Part = 1 then solve1 else solve2
         solve puzzle.Lines
+
+module DaySeven =
+    open CommonTypes
+
+    let solve puzzle =
+        if puzzle.Part = 1 then "1" else "2"
