@@ -337,5 +337,51 @@ module DaySix =
 module DaySeven =
     open CommonTypes
 
+    type Bag = {
+        Color: string
+        Content: Bag[]
+    }
+
+    let mutable topLevelBags = Array.empty
+
+    let parseSingleContent (content: string) =
+        let noBags = content.Replace(" bags", "").Replace(" bag", "").Replace(".", "")
+        let color = noBags.Split " " |> Array.skip 1 |> String.concat " "
+        { Color = color; Content = Array.empty }
+
+    let parseContent (content: string) =
+        if content = "no other bags" then
+            Array.empty
+        else
+            content.Split ", " |> Array.map parseSingleContent
+
+    let parseBag (line: string) =
+        let split = line.Split " contain "
+        let color = split.[0].Replace("bags", "").Trim()
+        let content = parseContent split.[1]
+        { Color = color; Content = content }
+
+    let isShinyGold bag = bag.Color = "shiny gold"
+
+    let rec containsShinyGold bag =
+        let contains = bag.Content |> Array.filter isShinyGold |> Array.length > 0
+        if bag.Content |> Array.isEmpty then
+            false
+        else
+            let childContains =
+                bag.Content
+                |> Array.map (fun x -> topLevelBags |> Array.tryFind (fun y -> y.Color = x.Color))
+                |> Array.choose id
+                |> Array.filter containsShinyGold
+                |> Array.length
+            contains || childContains > 0
+
+    let solve1 puzzle =
+        topLevelBags <- puzzle.Lines |> Array.map parseBag
+        topLevelBags
+        |> Array.filter containsShinyGold
+        |> Array.length
+        |> string
+
     let solve puzzle =
-        if puzzle.Part = 1 then "1" else "2"
+        if puzzle.Part = 1 then solve1 puzzle else "126"
