@@ -340,17 +340,19 @@ module DaySeven =
     type Bag = {
         Color: string
         Content: Bag[]
+        Count: int
     }
 
     let mutable topLevelBags = Array.empty
 
     let parseSingleContent (content: string) =
         let noBags = content.Replace(" bags", "").Replace(" bag", "").Replace(".", "")
-        let color = noBags.Split " " |> Array.skip 1 |> String.concat " "
-        { Color = color; Content = Array.empty }
+        let split = noBags.Split " "
+        let color = split |> Array.skip 1 |> String.concat " "
+        { Color = color; Content = Array.empty; Count = split.[0] |> int }
 
     let parseContent (content: string) =
-        if content = "no other bags" then
+        if content = "no other bags." then
             Array.empty
         else
             content.Split ", " |> Array.map parseSingleContent
@@ -359,7 +361,7 @@ module DaySeven =
         let split = line.Split " contain "
         let color = split.[0].Replace("bags", "").Trim()
         let content = parseContent split.[1]
-        { Color = color; Content = content }
+        { Color = color; Content = content; Count = 1 }
 
     let isShinyGold bag = bag.Color = "shiny gold"
 
@@ -383,5 +385,31 @@ module DaySeven =
         |> Array.length
         |> string
 
+    let rec countContent layer bag =
+        if Array.isEmpty bag.Content then
+            bag.Count
+        else
+            let contentCount =
+                bag.Content
+                |> Array.map (fun x -> x.Count)
+                |> Array.sum
+            let recCount =
+                bag.Content
+                |> Array.map (fun x -> topLevelBags |> Array.find (fun y -> y.Color = x.Color))
+                |> Array.map (fun x -> countContent (layer+1) x)
+                |> Array.sum
+            (bag.Count  + contentCount + (recCount * layer))
+
+    let solve2 puzzle =
+        topLevelBags <- puzzle.Lines |> Array.map parseBag
+        let shinyGold = topLevelBags |> Array.find isShinyGold
+        countContent 1 shinyGold |> string
+
     let solve puzzle =
-        if puzzle.Part = 1 then solve1 puzzle else "126"
+        if puzzle.Part = 1 then solve1 puzzle else solve2 puzzle
+
+module DayEight =
+    open CommonTypes
+
+    let solve puzzle =
+        if puzzle.Part = 1 then "1" else "2"
