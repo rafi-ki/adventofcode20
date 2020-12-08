@@ -437,37 +437,41 @@ module DayEight =
         | "jmp" -> Instruction.Jmp value
         | _ -> failwith "unrecognized instruction"
 
+    let private executeInstruction instruction field =
+        match instruction with
+        | Nop value -> { field with Index = field.Index + 1 }
+        | Acc value -> { field with Accumulator = field.Accumulator + value; Index = field.Index + 1 }
+        | Jmp value -> { field with Index = field.Index + value }
+
     let rec move instruction field (instructions: Instruction[]) =
         if field.Visited |> Array.contains field.Index then
             { field with Infinity = true }
         else
-            let newField = match instruction with
-                            | Nop value -> { field with Index = field.Index + 1 }
-                            | Acc value -> { field with Accumulator = field.Accumulator + value; Index = field.Index + 1 }
-                            | Jmp value -> { field with Index = field.Index + value }
+            let newField = executeInstruction instruction field
             if newField.Index = instructions.Length then
                 newField
             else
-                move instructions.[newField.Index] { newField with Visited = Array.append field.Visited [|field.Index|] }  instructions
+                move instructions.[newField.Index] { newField with Visited = Array.append field.Visited [|field.Index|] } instructions
 
     let solve1 lines =
         let instructions = lines |> Array.map parseInstruction
         let lastField = move instructions.[0] initState instructions
         lastField.Accumulator |> string
 
-    let runInstructions i toBeChanged instructions =
-        let flippedInstruction = match toBeChanged with
-                                | Jmp x -> Nop x
-                                | Nop x -> Jmp x
-                                | Acc x -> Acc x
-        let changedInstructions = Array.copy instructions
-        changedInstructions.[i] <- flippedInstruction
-        move changedInstructions.[0] initState changedInstructions
+    let flip instruction =
+        match instruction with
+        | Jmp x -> Nop x
+        | Nop x -> Jmp x
+        | Acc x -> Acc x
 
     let solve2 lines =
         let instructions = lines |> Array.map parseInstruction
+        let runInstructions i toBeChanged =
+            let changedInstructions = Array.copy instructions
+            changedInstructions.[i] <- flip toBeChanged
+            move changedInstructions.[0] initState changedInstructions
         let result = instructions
-                  |> Array.mapi (fun i x -> runInstructions i x instructions)
+                  |> Array.mapi runInstructions
                   |> Array.find (fun x -> not x.Infinity)
         result.Accumulator |> string
 
