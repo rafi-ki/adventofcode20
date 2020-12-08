@@ -478,3 +478,9 @@ module DayEight =
     let solve puzzle =
         puzzle.Lines
         |> if puzzle.Part = 1 then solve1 else solve2
+
+module DayNine =
+    open CommonTypes
+
+    let solve puzzle =
+        if puzzle.Part = 1 then "1" else "2"
