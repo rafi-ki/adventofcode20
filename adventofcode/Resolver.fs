@@ -416,7 +416,7 @@ module DayEight =
         | Jmp of int
         | Nop of int
 
-    type Field = {
+    type BootLoader = {
         Accumulator: int
         Index: int
         Visited: int[]
@@ -432,9 +432,9 @@ module DayEight =
         let split = line.Split " "
         let value = int split.[1]
         match split.[0] with
-        | "nop" -> Instruction.Nop value
-        | "acc" -> Instruction.Acc value
-        | "jmp" -> Instruction.Jmp value
+        | "nop" -> Nop value
+        | "acc" -> Acc value
+        | "jmp" -> Jmp value
         | _ -> failwith "unrecognized instruction"
 
     let private executeInstruction instruction field =
@@ -443,20 +443,21 @@ module DayEight =
         | Acc value -> { field with Accumulator = field.Accumulator + value; Index = field.Index + 1 }
         | Jmp value -> { field with Index = field.Index + value }
 
-    let rec move instruction field (instructions: Instruction[]) =
-        if field.Visited |> Array.contains field.Index then
-            { field with Infinity = true }
+    let rec move instruction bootLoader (instructions: Instruction[]) =
+        if bootLoader.Visited |> Array.contains bootLoader.Index then
+            { bootLoader with Infinity = true }
         else
-            let newField = executeInstruction instruction field
-            if newField.Index = instructions.Length then
-                newField
+            let newBootloader = executeInstruction instruction bootLoader
+            if newBootloader.Index = instructions.Length then
+                newBootloader
             else
-                move instructions.[newField.Index] { newField with Visited = Array.append field.Visited [|field.Index|] } instructions
+                move instructions.[newBootloader.Index]
+                    { newBootloader with Visited = Array.append bootLoader.Visited [|bootLoader.Index|] } instructions
 
     let solve1 lines =
         let instructions = lines |> Array.map parseInstruction
-        let lastField = move instructions.[0] initState instructions
-        lastField.Accumulator |> string
+        let result = move instructions.[0] initState instructions
+        result.Accumulator |> string
 
     let flip instruction =
         match instruction with
@@ -470,10 +471,11 @@ module DayEight =
             let changedInstructions = Array.copy instructions
             changedInstructions.[i] <- flip toBeChanged
             move changedInstructions.[0] initState changedInstructions
-        let result = instructions
+        let finiteBootloader =
+                  instructions
                   |> Array.mapi runInstructions
                   |> Array.find (fun x -> not x.Infinity)
-        result.Accumulator |> string
+        finiteBootloader.Accumulator |> string
 
     let solve puzzle =
         puzzle.Lines
