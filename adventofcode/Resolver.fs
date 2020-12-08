@@ -411,5 +411,43 @@ module DaySeven =
 module DayEight =
     open CommonTypes
 
+    type Instruction =
+        | Acc of int
+        | Jmp of int
+        | Nop
+
+    type Field = {
+        Accumulator: int
+        Index: int
+        Visited: int[]
+    }
+
+    let parseInstruction (line: string) =
+        let split = line.Split " "
+        let value = int split.[1]
+        match split.[0] with
+        | "nop" -> Instruction.Nop
+        | "acc" -> Instruction.Acc value
+        | "jmp" -> Instruction.Jmp value
+        | _ -> failwith "unrecognized instruction"
+
+    let rec move instruction field (instructions: Instruction[]) =
+        if field.Visited |> Array.contains field.Index then
+             field
+        else
+            let newField = match instruction with
+                            | Nop -> { field with Index = field.Index+1 }
+                            | Acc value -> { field with Accumulator = field.Accumulator + value; Index = field.Index+1 }
+                            | Jmp value -> { field with Index = field.Index + value }
+            move instructions.[newField.Index] { newField with Visited = Array.append field.Visited [|field.Index|] }  instructions
+
+    let solve1 lines =
+        let field = { Accumulator = 0
+                      Index = 0
+                      Visited = [||] }
+        let instructions = lines |> Array.map parseInstruction
+        let lastField = move instructions.[0] field instructions
+        lastField.Accumulator |> string
+
     let solve puzzle =
-        if puzzle.Part = 1 then "1" else "2"
+        if puzzle.Part = 1 then solve1 puzzle.Lines else "2"
