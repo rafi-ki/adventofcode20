@@ -278,3 +278,21 @@ module DayEight =
         }
         let result = DayEight.solve puzzle
         Assert.Equal("5", result)
+
+    [<Fact>]
+    let ``solve example part two``() =
+        let puzzle = {
+            Day = 8
+            Part = 2
+            Lines = [|  "nop +0"
+                        "acc +1"
+                        "jmp +4"
+                        "acc +3"
+                        "jmp -3"
+                        "acc -99"
+                        "acc +1"
+                        "jmp -4"
+                        "acc +6" |]
+        }
+        let result = DayEight.solve puzzle
+        Assert.Equal("8", result)

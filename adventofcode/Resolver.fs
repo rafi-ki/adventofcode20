@@ -414,40 +414,63 @@ module DayEight =
     type Instruction =
         | Acc of int
         | Jmp of int
-        | Nop
+        | Nop of int
 
     type Field = {
         Accumulator: int
         Index: int
         Visited: int[]
+        Infinity: bool
     }
+
+    let initState = { Accumulator = 0
+                      Index = 0
+                      Visited = [||]
+                      Infinity = false }
 
     let parseInstruction (line: string) =
         let split = line.Split " "
         let value = int split.[1]
         match split.[0] with
-        | "nop" -> Instruction.Nop
+        | "nop" -> Instruction.Nop value
         | "acc" -> Instruction.Acc value
         | "jmp" -> Instruction.Jmp value
         | _ -> failwith "unrecognized instruction"
 
     let rec move instruction field (instructions: Instruction[]) =
         if field.Visited |> Array.contains field.Index then
-             field
+            { field with Infinity = true }
         else
             let newField = match instruction with
-                            | Nop -> { field with Index = field.Index+1 }
-                            | Acc value -> { field with Accumulator = field.Accumulator + value; Index = field.Index+1 }
+                            | Nop value -> { field with Index = field.Index + 1 }
+                            | Acc value -> { field with Accumulator = field.Accumulator + value; Index = field.Index + 1 }
                             | Jmp value -> { field with Index = field.Index + value }
-            move instructions.[newField.Index] { newField with Visited = Array.append field.Visited [|field.Index|] }  instructions
+            if newField.Index = instructions.Length then
+                newField
+            else
+                move instructions.[newField.Index] { newField with Visited = Array.append field.Visited [|field.Index|] }  instructions
 
     let solve1 lines =
-        let field = { Accumulator = 0
-                      Index = 0
-                      Visited = [||] }
         let instructions = lines |> Array.map parseInstruction
-        let lastField = move instructions.[0] field instructions
+        let lastField = move instructions.[0] initState instructions
         lastField.Accumulator |> string
 
+    let runInstructions i toBeChanged instructions =
+        let flippedInstruction = match toBeChanged with
+                                | Jmp x -> Nop x
+                                | Nop x -> Jmp x
+                                | Acc x -> Acc x
+        let changedInstructions = Array.copy instructions
+        changedInstructions.[i] <- flippedInstruction
+        move changedInstructions.[0] initState changedInstructions
+
+    let solve2 lines =
+        let instructions = lines |> Array.map parseInstruction
+        let result = instructions
+                  |> Array.mapi (fun i x -> runInstructions i x instructions)
+                  |> Array.find (fun x -> not x.Infinity)
+        result.Accumulator |> string
+
     let solve puzzle =
-        if puzzle.Part = 1 then solve1 puzzle.Lines else "2"
+        puzzle.Lines
+        |> if puzzle.Part = 1 then solve1 else solve2
