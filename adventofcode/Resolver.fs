@@ -484,5 +484,25 @@ module DayEight =
 module DayNine =
     open CommonTypes
 
+    let preamble = 25
+
+    let addsUp i x (values: int64[]) =
+        let slice = values.[i-preamble ..i-1]
+        let mutable result = false;
+        for v in slice do
+            let slicedOut = slice |> Array.except [|v|] |> Array.tryFind (fun item -> item + v = x)
+            slicedOut |> Option.map (fun x -> result <- true) |> ignore
+        result
+
+    let solve1 (values: int64[]) =
+        let last = values
+                    |> Array.skip preamble
+                    |> Array.mapi (fun i x -> (i+preamble, x))
+                    |> Seq.takeWhile (fun x -> addsUp (fst x) (snd x) values)
+                    |> Seq.last
+        let next = values.[(fst last)+1]
+        next |> string
+
     let solve puzzle =
-        if puzzle.Part = 1 then "1" else "2"
+        let values = puzzle.Lines |> Array.map int64
+        if puzzle.Part = 1 then solve1 values else "2"
