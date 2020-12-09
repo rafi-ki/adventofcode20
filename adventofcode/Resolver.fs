@@ -526,15 +526,11 @@ module DayNine =
             visited <- visited |> Array.append [|v|]
         result
 
-    let max x y = if x > y then x else y
-
-    let min x y = if x < y then x else y
-
     let solve2 (values: int64[]) =
         let solution1 = solve1 values |> int64
         let contiguous = findContiguous solution1 values
-        let min = contiguous |> Array.reduce min
-        let max = contiguous |> Array.reduce max
+        let min = contiguous |> Seq.min
+        let max = contiguous |> Seq.max
         min + max |> string
 
     let solve puzzle =
