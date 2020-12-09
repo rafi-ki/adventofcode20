@@ -487,7 +487,7 @@ module DayNine =
     let preamble = 25
 
     let addsUp i x (values: int64[]) =
-        let slice = values.[i-preamble ..i-1]
+        let slice = values.[i-preamble..i-1]
         let mutable result = false;
         for v in slice do
             let slicedOut = slice |> Array.except [|v|] |> Array.tryFind (fun item -> item + v = x)
@@ -503,6 +503,40 @@ module DayNine =
         let next = values.[(fst last)+1]
         next |> string
 
+    let sumWhile predicate (values: (int * int64)[]) =
+        let mutable result = 0L
+        let mutable i = 0
+        let mutable originalIndex = 0
+        while predicate result do
+            let (index, value) = values.[i]
+            result <- result + value
+            originalIndex <- index
+            i <- i + 1
+        (result, i-1, originalIndex)
+
+    let findContiguous (solution: int64) (values: int64[]) =
+        let mutable result = [||]
+        let mutable visited = [||]
+        let indexedValues = values |> Array.mapi (fun i x -> (i, x))
+        for v in indexedValues do
+            let exceptValues = indexedValues |> Array.except visited
+            let (sum, index, originalIndex) = exceptValues |> sumWhile (fun x -> x < solution)
+            if sum = solution && index > 1 then
+                result <- values.[originalIndex - index..originalIndex]
+            visited <- visited |> Array.append [|v|]
+        result
+
+    let max x y = if x > y then x else y
+
+    let min x y = if x < y then x else y
+
+    let solve2 (values: int64[]) =
+        let solution1 = solve1 values |> int64
+        let contiguous = findContiguous solution1 values
+        let min = contiguous |> Array.reduce min
+        let max = contiguous |> Array.reduce max
+        min + max |> string
+
     let solve puzzle =
         let values = puzzle.Lines |> Array.map int64
-        if puzzle.Part = 1 then solve1 values else "2"
+        values |> if puzzle.Part = 1 then solve1 else solve2

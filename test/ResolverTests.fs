@@ -327,3 +327,32 @@ module DayNine =
         }
         let result = DayNine.solve puzzle
         Assert.Equal("127", result)
+
+    [<Fact>]
+    let ``solve example part two``() =
+        let puzzle = {
+            Day = 9
+            Part = 2
+            Lines = [|  "35"
+                        "20"
+                        "15"
+                        "25"
+                        "47"
+                        "40"
+                        "62"
+                        "55"
+                        "65"
+                        "95"
+                        "102"
+                        "117"
+                        "150"
+                        "182"
+                        "127"
+                        "219"
+                        "299"
+                        "277"
+                        "309"
+                        "576" |]
+        }
+        let result = DayNine.solve puzzle
+        Assert.Equal("62", result)
