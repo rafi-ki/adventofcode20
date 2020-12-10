@@ -363,26 +363,17 @@ module DayTen =
         let puzzle = {
             Day = 10
             Part = 1
-            Lines = [|  "35"
-                        "20"
+            Lines = [|  "16"
+                        "10"
                         "15"
-                        "25"
-                        "47"
-                        "40"
-                        "62"
-                        "55"
-                        "65"
-                        "95"
-                        "102"
-                        "117"
-                        "150"
-                        "182"
-                        "127"
-                        "219"
-                        "299"
-                        "277"
-                        "309"
-                        "576" |]
+                        "5"
+                        "1"
+                        "11"
+                        "7"
+                        "19"
+                        "6"
+                        "12"
+                        "4" |]
         }
         let result = DayTen.solve puzzle
-        Assert.Equal("127", result)
+        Assert.Equal("35", result)

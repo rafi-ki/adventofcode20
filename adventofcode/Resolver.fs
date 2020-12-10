@@ -540,5 +540,18 @@ module DayNine =
 module DayTen =
     open CommonTypes
 
+    let sandwich values = Array.concat [| [|0|]; values; [|(Array.last values)+3|] |]
+
+    let solve1 values =
+        let differences =
+            Array.sort values |> sandwich
+            |> Array.sort
+            |> Array.pairwise
+            |> Array.map (fun (x, y) -> y-x)
+        let difference1 = differences |> Array.filter ((=) 1) |> Array.length
+        let difference3 = differences |> Array.filter ((=) 3) |> Array.length
+        difference1 * difference3 |> string
+
     let solve puzzle =
-        if puzzle.Part = 1 then "1" else "2"
+        let values = puzzle.Lines |> Array.map int
+        if puzzle.Part = 1 then solve1 values else "2"
