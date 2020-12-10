@@ -561,16 +561,13 @@ module DayTen =
                 1L
             else
                 let valueAt = values.[index]
-                let nextIndices =
+                let result =
                     values.[index+1..index+3]
                     |> Array.mapi (fun i x -> (index+i+1, x))
                     |> Array.filter (fun (_, x) -> x - valueAt <= 3)
-                let childSum =
-                    nextIndices
-                    |> Array.map (fun (i, _) -> move i values)
-                    |> Array.sum
-                cache.Add(index, childSum)
-                childSum
+                    |> Array.sumBy (fun (i, _) -> move i values)
+                cache.Add(index, result)
+                result
 
     let solve2 values =
         let complete = Array.sort values |> sandwich
