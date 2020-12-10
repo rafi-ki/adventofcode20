@@ -545,13 +545,37 @@ module DayTen =
     let solve1 values =
         let differences =
             Array.sort values |> sandwich
-            |> Array.sort
             |> Array.pairwise
             |> Array.map (fun (x, y) -> y-x)
         let difference1 = differences |> Array.filter ((=) 1) |> Array.length
         let difference3 = differences |> Array.filter ((=) 3) |> Array.length
         difference1 * difference3 |> string
 
+    let cache = Dictionary<int, int64>()
+
+    let rec move index (values: int[]) =
+        match cache.TryGetValue index with
+        | true, v -> v
+        | false, _ ->
+            if index = values.Length-1 then
+                1L
+            else
+                let valueAt = values.[index]
+                let nextIndices =
+                    values.[index+1..index+3]
+                    |> Array.mapi (fun i x -> (index+i+1, x))
+                    |> Array.filter (fun (_, x) -> x - valueAt <= 3)
+                let childSum =
+                    nextIndices
+                    |> Array.map (fun (i, _) -> move i values)
+                    |> Array.sum
+                cache.Add(index, childSum)
+                childSum
+
+    let solve2 values =
+        let complete = Array.sort values |> sandwich
+        move 0 complete |> string
+
     let solve puzzle =
         let values = puzzle.Lines |> Array.map int
-        if puzzle.Part = 1 then solve1 values else "2"
+        if puzzle.Part = 1 then solve1 values else solve2 values
