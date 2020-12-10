@@ -576,3 +576,9 @@ module DayTen =
     let solve puzzle =
         let values = puzzle.Lines |> Array.map int
         if puzzle.Part = 1 then solve1 values else solve2 values
+
+module DayEleven =
+    open CommonTypes
+
+    let solve puzzle =
+        if puzzle.Part = 1 then "1" else "2"
