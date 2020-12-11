@@ -580,5 +580,84 @@ module DayTen =
 module DayEleven =
     open CommonTypes
 
+    type Usage = Floor | Empty | Occupied
+
+    type Seat = {
+        Col: int
+        Row: int
+        Usage: Usage
+    }
+
+    type WaitingArea = {
+        Seats: Seat[]
+    }
+
+    let private parseSeat col row c =
+        let usage = match c with
+                        | '.' -> Floor
+                        | 'L' -> Empty
+                        | '#' -> Occupied
+                        | _ -> failwith "Unknown char in waiting area"
+        { Col = col; Row = row; Usage = usage }
+
+    let parseWaitingArea lines =
+        lines |> Array.mapi
+                     (fun row line -> line |> Array.mapi
+                                                (fun col c -> parseSeat col row c))
+                     |> Array.collect id
+
+
+    let jointCache = Dictionary<(int*int), seq<int*int>>()
+
+    let crossJoint row col =
+        match jointCache.TryGetValue ((row, col)) with
+        | true, v -> v
+        | false, _ ->
+        let rows = [Math.Max(row - 1, 0) .. Math.Min(row + 1, 97)]
+        let cols = [Math.Max(col - 1, 0) .. Math.Min(col + 1, 89)]
+        rows
+        |> Seq.collect (fun r -> cols |> Seq.map (fun c -> r, c))
+        |> Seq.filter (fun (r, c) -> r <> row || c <> col) // filter own seat
+
+    let adjacentSeats (waitingArea: WaitingArea) (seat: Seat) =
+            crossJoint seat.Row seat.Col
+
+            |> Seq.map (fun (row, col) -> waitingArea.Seats |> Array.find (fun x -> x.Row = row && x.Col = col))
+            |> Array.ofSeq
+
+    let applyRule seat (adjacentSeats: Seat[]) =
+        let newUsage =
+            match seat.Usage with
+            | Floor -> Floor
+            | Empty ->
+                if (adjacentSeats |> Seq.filter (fun x -> x.Usage = Occupied) |> Seq.length) = 0 then
+                    Occupied
+                else
+                    Empty
+            | Occupied ->
+                if (adjacentSeats |> Seq.filter (fun x -> x.Usage = Occupied) |> Seq.length) > 3 then
+                    Empty
+                else
+                    Occupied
+        { seat with Usage = newUsage }
+
+    let runRound (waitingArea: WaitingArea) =
+        let newSeats =
+            waitingArea.Seats
+            |> Array.map (fun x -> applyRule x (adjacentSeats waitingArea x))
+        { waitingArea with Seats = newSeats }
+
+    let solve1 waitingArea =
+        let mutable mutableArea = runRound waitingArea
+        let mutable prev = waitingArea
+        while prev <> mutableArea do
+            prev <- mutableArea
+            mutableArea <- runRound prev
+        mutableArea.Seats
+        |> Array.filter (fun x -> x.Usage = Occupied)
+        |> Array.length
+        |> string
+
     let solve puzzle =
-        if puzzle.Part = 1 then "1" else "2"
+        let waitingArea = { Seats = parseWaitingArea (puzzle.Lines |> Array.map (fun x -> Seq.toArray x)) }
+        if puzzle.Part = 1 then solve1 waitingArea else "2"

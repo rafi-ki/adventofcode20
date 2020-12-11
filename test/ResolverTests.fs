@@ -405,17 +405,16 @@ module DayEleven =
         let puzzle = {
             Day = 11
             Part = 1
-            Lines = [|  "16"
-                        "10"
-                        "15"
-                        "5"
-                        "1"
-                        "11"
-                        "7"
-                        "19"
-                        "6"
-                        "12"
-                        "4" |]
+            Lines = [|  "L.LL.LL.LL"
+                        "LLLLLLL.LL"
+                        "L.L.L..L.."
+                        "LLLL.LL.LL"
+                        "L.LL.LL.LL"
+                        "L.LLLLL.LL"
+                        "..L.L....."
+                        "LLLLLLLLLL"
+                        "L.LLLLLL.L"
+                        "L.LLLLL.LL" |]
         }
         let result = DayEleven.solve puzzle
-        Assert.Equal("1", result)
+        Assert.Equal("37", result)
