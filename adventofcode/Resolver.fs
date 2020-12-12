@@ -439,7 +439,7 @@ module DayEight =
 
     let private executeInstruction instruction field =
         match instruction with
-        | Nop value -> { field with Index = field.Index + 1 }
+        | Nop _ -> { field with Index = field.Index + 1 }
         | Acc value -> { field with Accumulator = field.Accumulator + value; Index = field.Index + 1 }
         | Jmp value -> { field with Index = field.Index + value }
 
@@ -491,7 +491,7 @@ module DayNine =
         let mutable result = false;
         for v in slice do
             let slicedOut = slice |> Array.except [|v|] |> Array.tryFind (fun item -> item + v = x)
-            slicedOut |> Option.map (fun x -> result <- true) |> ignore
+            slicedOut |> Option.map (fun _ -> result <- true) |> ignore
         result
 
     let solve1 (values: int64[]) =
@@ -582,6 +582,8 @@ module DayEleven =
 
     type Usage = Floor | Empty | Occupied
 
+    let areaDimension = (97, 89)
+
     type Seat = {
         Col: int
         Row: int
@@ -611,11 +613,12 @@ module DayEleven =
         match jointCache.TryGetValue ((row, col)) with
         | true, v -> v
         | false, _ ->
-        let rows = [Math.Max(row - 1, 0) .. Math.Min(row + 1, 97)]
-        let cols = [Math.Max(col - 1, 0) .. Math.Min(col + 1, 89)]
-        rows
-        |> Seq.collect (fun r -> cols |> Seq.map (fun c -> r, c))
-        |> Seq.filter (fun (r, c) -> r <> row || c <> col) // filter own seat
+            let (maxRows, maxCols) = areaDimension
+            let rows = [Math.Max(row - 1, 0) .. Math.Min(row + 1, maxRows)]
+            let cols = [Math.Max(col - 1, 0) .. Math.Min(col + 1, maxCols)]
+            rows
+            |> Seq.collect (fun r -> cols |> Seq.map (fun c -> r, c))
+            |> Seq.filter (fun (r, c) -> r <> row || c <> col) // filter own seat
 
     let adjacentSeats (waitingArea: WaitingArea) (seat: Seat) =
             crossJoint seat.Row seat.Col
