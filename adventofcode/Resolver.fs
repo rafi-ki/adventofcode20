@@ -733,6 +733,7 @@ module DayTwelfth =
     type Ship = {
         FacingDirection: Direction
         Position: Position
+        Waypoint: Position
     }
 
     let parseInstruction (line: string) =
@@ -743,66 +744,47 @@ module DayTwelfth =
     let parseInstructions lines = lines |> Seq.map parseInstruction
 
     let moveNorth v ship=
-        let position = { ship.Position with Y = ship.Position.Y - v }
-        { ship with Position = position }
+        let waypoint = { ship.Waypoint with Y = ship.Waypoint.Y - v }
+        { ship with Waypoint = waypoint }
 
     let moveSouth v ship =
-        let position = { ship.Position with Y = ship.Position.Y + v }
-        { ship with Position = position }
+        let waypoint = { ship.Waypoint with Y = ship.Waypoint.Y + v }
+        { ship with Waypoint = waypoint }
 
     let moveEast v ship =
-        let position = { ship.Position with X = ship.Position.X + v }
-        { ship with Position = position }
+        let waypoint = { ship.Waypoint with X = ship.Waypoint.X + v }
+        { ship with Waypoint = waypoint }
 
     let moveWest v ship =
-        let position = { ship.Position with X = ship.Position.X - v }
-        { ship with Position = position }
+        let waypoint = { ship.Waypoint with X = ship.Waypoint.X - v }
+        { ship with Waypoint = waypoint }
 
     let moveForward v ship =
-        let move =
-            match ship.FacingDirection with
-            | North -> moveNorth
-            | South -> moveSouth
-            | West -> moveWest
-            | East -> moveEast
-        move v ship
+        let xMovement = ship.Waypoint.X * v
+        let yMovement = ship.Waypoint.Y * v
+        let position = { ship.Position with X = ship.Position.X + xMovement; Y = ship.Position.Y + yMovement }
+        { ship with Position = position }
 
-    let turnAround direction =
-        match direction with
-        | North -> South
-        | South -> North
-        | West -> East
-        | East -> West
-
-    let changeDirectionLeft direction degree =
-        match direction with
-        | North -> if degree = 90 then West else East
-        | South -> if degree = 90 then East else West
-        | West -> if degree = 90 then South else North
-        | East -> if degree = 90 then North else South
-
-    let changeDirectionRight direction degree =
-        match direction with
-        | North -> if degree = 90 then East else West
-        | South -> if degree = 90 then West else East
-        | West -> if degree = 90 then North else South
-        | East -> if degree = 90 then South else North
+    let turnAround waypoint =
+        { X = (-1) * waypoint.X; Y = (-1) * waypoint.Y }
 
     let turnLeft v ship =
-        let direction =
-            if v = 180 then
-                turnAround ship.FacingDirection
-            else
-                changeDirectionLeft ship.FacingDirection v
-        { ship with FacingDirection = direction }
+        let waypoint =
+            match v with
+            | 90 -> { X = ship.Waypoint.Y; Y = (-1) * ship.Waypoint.X }
+            | 180 -> turnAround ship.Waypoint
+            | 270 -> { X = (-1) * ship.Waypoint.Y; Y = ship.Waypoint.X }
+            | _ -> failwith "unknown degrees"
+        { ship with Waypoint = waypoint }
 
     let turnRight v ship =
-        let direction =
-            if v = 180 then
-                turnAround ship.FacingDirection
-            else
-                changeDirectionRight ship.FacingDirection v
-        { ship with FacingDirection = direction }
+        let waypoint =
+            match v with
+            | 90 -> { X = (-1) * ship.Waypoint.Y; Y = ship.Waypoint.X }
+            | 180 -> turnAround ship.Waypoint
+            | 270 -> { X = ship.Waypoint.Y; Y = (-1) * ship.Waypoint.X }
+            | _ -> failwith "unknown degrees"
+        { ship with Waypoint = waypoint }
 
     let move instruction =
         match instruction with
@@ -819,6 +801,20 @@ module DayTwelfth =
         let ship = {
             FacingDirection = East
             Position = { X = 0; Y = 0; }
+            Waypoint = { X = 0; Y = 0; }
+        }
+        let move =
+            instructions
+            |> Seq.map (fun x -> move x)
+            |> Seq.reduce (>>)
+        let finalShip = move ship
+        Math.Abs finalShip.Position.X + Math.Abs finalShip.Position.Y |> string
+
+    let solve2 instructions =
+        let ship = {
+            FacingDirection = East
+            Position = { X = 0; Y = 0; }
+            Waypoint = { X = 10; Y = -1; }
         }
         let move =
             instructions
@@ -829,4 +825,4 @@ module DayTwelfth =
 
     let solve puzzle =
         let instructions = parseInstructions puzzle.Lines
-        if puzzle.Part = 1 then solve1 instructions else "2"
+        if puzzle.Part = 1 then solve1 instructions else solve2 instructions
