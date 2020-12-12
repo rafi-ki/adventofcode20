@@ -582,7 +582,10 @@ module DayEleven =
 
     type Usage = Floor | Empty | Occupied
 
-    let areaDimension = (97, 89)
+//    let areaDimension = (97, 89)
+    let areaDimension = (9, 9)
+
+    type Direction = Up | Down | Left | Right | UpRight | UpLeft | DownRight | DownLeft
 
     type Seat = {
         Col: int
@@ -621,9 +624,66 @@ module DayEleven =
             |> Seq.filter (fun (r, c) -> r <> row || c <> col) // filter own seat
 
     let adjacentSeats (waitingArea: WaitingArea) (seat: Seat) =
-            crossJoint seat.Row seat.Col
-            |> Seq.map (fun (row, col) -> waitingArea |> Array.find (fun x -> x.Row = row && x.Col = col))
-            |> Array.ofSeq
+        crossJoint seat.Row seat.Col
+        |> Seq.map (fun (row, col) -> waitingArea |> Array.find (fun x -> x.Row = row && x.Col = col))
+        |> Array.ofSeq
+
+    let nextNoFloorSeat (waitingArea: WaitingArea) (seat: Seat) direction =
+        let (maxRow, maxCol) = areaDimension
+        match direction with
+        | Up ->
+            if seat.Row = 0 then
+                None
+            else
+                let upwardsRows = seq [seat.Row-1..0]
+                upwardsRows
+                |> Seq.map (fun x -> waitingArea |> Array.find (fun y -> y.Row = x && y.Col = seat.Col))
+                |> Seq.takeWhile (fun x -> x.Usage = Floor)
+                |> Seq.last
+                |> Some
+        | Down ->
+            if seat.Row = maxRow then
+                None
+            else
+                let downwardsRow = seq [seat.Row+1..maxRow]
+                downwardsRow
+                |> Seq.map (fun x -> waitingArea |> Array.find (fun y -> y.Row = x && y.Col = seat.Col))
+                |> Seq.takeWhile (fun x -> x.Usage = Floor)
+                |> Seq.last
+                |> Some
+        | Right ->
+            if seat.Col = maxCol then
+                None
+            else
+                let rightCols = seq [seat.Col+1..maxCol]
+                rightCols
+                |> Seq.map (fun x -> waitingArea |> Array.find (fun y -> y.Row = seat.Row && y.Col = x))
+                |> Seq.takeWhile (fun x -> x.Usage = Floor)
+                |> Seq.last
+                |> Some
+        | Left ->
+            if seat.Col = 0 then
+                None
+            else
+                let rightCols = seq [seat.Col-1..0]
+                rightCols
+                |> Seq.map (fun x -> waitingArea |> Array.find (fun y -> y.Row = seat.Row && y.Col = x))
+                |> Seq.takeWhile (fun x -> x.Usage = Floor)
+                |> Seq.last
+                |> Some
+        | UpLeft ->
+            if seat.Row = 0 || seat.Col = 0 then
+                None
+            else
+                let upwardsRows = seq [seat.Row-1..0]
+                upwardsRows
+                |> Seq.map (fun x -> waitingArea |> Array.find (fun y -> y.Row = x && y.Col = seat.Col))
+                |> Seq.takeWhile (fun x -> x.Usage = Floor)
+                |> Seq.last
+                |> Some
+
+    let lookaroundSeats (waitingArea: WaitingArea) (seat: Seat) =
+        ""
 
     let applyRule seat (adjacentSeats: Seat[]) =
         let newUsage =
@@ -659,3 +719,9 @@ module DayEleven =
     let solve puzzle =
         let waitingArea = parseWaitingArea (puzzle.Lines |> Array.map (fun x -> Seq.toArray x))
         if puzzle.Part = 1 then solve1 waitingArea else "2"
+
+module DayTwelfth =
+    open CommonTypes
+
+    let solve puzzle =
+        if puzzle.Part = 1 then "1" else "2"
