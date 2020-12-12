@@ -723,5 +723,108 @@ module DayEleven =
 module DayTwelfth =
     open CommonTypes
 
+    type Position = {
+        X: int
+        Y: int
+    }
+
+    type Direction = North | South | East | West
+
+    type Ship = {
+        FacingDirection: Direction
+        Position: Position
+    }
+
+    let parseInstruction (line: string) =
+        let c = line.Substring(0, 1) |> char
+        let v = line.Substring(1) |> int
+        (c, v)
+
+    let parseInstructions lines = lines |> Seq.map parseInstruction
+
+    let moveNorth v ship=
+        let position = { ship.Position with Y = ship.Position.Y - v }
+        { ship with Position = position }
+
+    let moveSouth v ship =
+        let position = { ship.Position with Y = ship.Position.Y + v }
+        { ship with Position = position }
+
+    let moveEast v ship =
+        let position = { ship.Position with X = ship.Position.X + v }
+        { ship with Position = position }
+
+    let moveWest v ship =
+        let position = { ship.Position with X = ship.Position.X - v }
+        { ship with Position = position }
+
+    let moveForward v ship =
+        let move =
+            match ship.FacingDirection with
+            | North -> moveNorth
+            | South -> moveSouth
+            | West -> moveWest
+            | East -> moveEast
+        move v ship
+
+    let turnAround direction =
+        match direction with
+        | North -> South
+        | South -> North
+        | West -> East
+        | East -> West
+
+    let changeDirectionLeft direction degree =
+        if degree = 180 then
+            turnAround direction
+        else
+            match direction with
+            | North -> if degree = 90 then West else East
+            | South -> if degree = 90 then East else West
+            | West -> if degree = 90 then South else North
+            | East -> if degree = 90 then North else South
+
+    let changeDirectionRight direction degree =
+        if degree = 180 then
+            turnAround direction
+        else
+            match direction with
+            | North -> if degree = 90 then East else West
+            | South -> if degree = 90 then West else East
+            | West -> if degree = 90 then North else South
+            | East -> if degree = 90 then South else North
+
+    let turnLeft v ship =
+        let direction = changeDirectionLeft ship.FacingDirection v
+        { ship with FacingDirection = direction }
+
+    let turnRight v ship =
+        let direction = changeDirectionRight ship.FacingDirection v
+        { ship with FacingDirection = direction }
+
+    let move instruction =
+        match instruction with
+        | ('N', v) -> moveNorth v
+        | ('S', v) -> moveSouth v
+        | ('E', v) -> moveEast v
+        | ('W', v) -> moveWest v
+        | ('F', v) -> moveForward v
+        | ('L', v) -> turnLeft v
+        | ('R', v) -> turnRight v
+        | _ -> failwith "unknown instruction"
+
+    let solve1 instructions =
+        let ship = {
+            FacingDirection = East
+            Position = { X = 0; Y = 0; }
+        }
+        let movements =
+            instructions
+            |> Seq.map (fun x -> move x)
+            |> Seq.reduce (>>)
+        let finalShip = movements ship
+        Math.Abs finalShip.Position.X + Math.Abs finalShip.Position.Y |> string
+
     let solve puzzle =
-        if puzzle.Part = 1 then "1" else "2"
+        let instructions = parseInstructions puzzle.Lines
+        if puzzle.Part = 1 then solve1 instructions else "2"

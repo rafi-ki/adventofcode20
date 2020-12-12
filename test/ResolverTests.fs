@@ -452,4 +452,4 @@ module DayTwelfth =
                         "F11" |]
         }
         let result = DayTwelfth.solve puzzle
-        Assert.Equal("37", result)
+        Assert.Equal("25", result)
