@@ -588,9 +588,7 @@ module DayEleven =
         Usage: Usage
     }
 
-    type WaitingArea = {
-        Seats: Seat[]
-    }
+    type WaitingArea = Seat[]
 
     let private parseSeat col row c =
         let usage = match c with
@@ -621,8 +619,7 @@ module DayEleven =
 
     let adjacentSeats (waitingArea: WaitingArea) (seat: Seat) =
             crossJoint seat.Row seat.Col
-
-            |> Seq.map (fun (row, col) -> waitingArea.Seats |> Array.find (fun x -> x.Row = row && x.Col = col))
+            |> Seq.map (fun (row, col) -> waitingArea |> Array.find (fun x -> x.Row = row && x.Col = col))
             |> Array.ofSeq
 
     let applyRule seat (adjacentSeats: Seat[]) =
@@ -642,10 +639,8 @@ module DayEleven =
         { seat with Usage = newUsage }
 
     let runRound (waitingArea: WaitingArea) =
-        let newSeats =
-            waitingArea.Seats
-            |> Array.map (fun x -> applyRule x (adjacentSeats waitingArea x))
-        { waitingArea with Seats = newSeats }
+        waitingArea
+        |> Array.map (fun x -> applyRule x (adjacentSeats waitingArea x))
 
     let solve1 waitingArea =
         let mutable mutableArea = runRound waitingArea
@@ -653,11 +648,11 @@ module DayEleven =
         while prev <> mutableArea do
             prev <- mutableArea
             mutableArea <- runRound prev
-        mutableArea.Seats
+        mutableArea
         |> Array.filter (fun x -> x.Usage = Occupied)
         |> Array.length
         |> string
 
     let solve puzzle =
-        let waitingArea = { Seats = parseWaitingArea (puzzle.Lines |> Array.map (fun x -> Seq.toArray x)) }
+        let waitingArea = parseWaitingArea (puzzle.Lines |> Array.map (fun x -> Seq.toArray x))
         if puzzle.Part = 1 then solve1 waitingArea else "2"
