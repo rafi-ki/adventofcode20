@@ -775,31 +775,33 @@ module DayTwelfth =
         | East -> West
 
     let changeDirectionLeft direction degree =
-        if degree = 180 then
-            turnAround direction
-        else
-            match direction with
-            | North -> if degree = 90 then West else East
-            | South -> if degree = 90 then East else West
-            | West -> if degree = 90 then South else North
-            | East -> if degree = 90 then North else South
+        match direction with
+        | North -> if degree = 90 then West else East
+        | South -> if degree = 90 then East else West
+        | West -> if degree = 90 then South else North
+        | East -> if degree = 90 then North else South
 
     let changeDirectionRight direction degree =
-        if degree = 180 then
-            turnAround direction
-        else
-            match direction with
-            | North -> if degree = 90 then East else West
-            | South -> if degree = 90 then West else East
-            | West -> if degree = 90 then North else South
-            | East -> if degree = 90 then South else North
+        match direction with
+        | North -> if degree = 90 then East else West
+        | South -> if degree = 90 then West else East
+        | West -> if degree = 90 then North else South
+        | East -> if degree = 90 then South else North
 
     let turnLeft v ship =
-        let direction = changeDirectionLeft ship.FacingDirection v
+        let direction =
+            if v = 180 then
+                turnAround ship.FacingDirection
+            else
+                changeDirectionLeft ship.FacingDirection v
         { ship with FacingDirection = direction }
 
     let turnRight v ship =
-        let direction = changeDirectionRight ship.FacingDirection v
+        let direction =
+            if v = 180 then
+                turnAround ship.FacingDirection
+            else
+                changeDirectionRight ship.FacingDirection v
         { ship with FacingDirection = direction }
 
     let move instruction =
@@ -818,11 +820,11 @@ module DayTwelfth =
             FacingDirection = East
             Position = { X = 0; Y = 0; }
         }
-        let movements =
+        let move =
             instructions
             |> Seq.map (fun x -> move x)
             |> Seq.reduce (>>)
-        let finalShip = movements ship
+        let finalShip = move ship
         Math.Abs finalShip.Position.X + Math.Abs finalShip.Position.Y |> string
 
     let solve puzzle =
