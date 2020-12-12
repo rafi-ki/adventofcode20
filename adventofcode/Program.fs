@@ -18,6 +18,7 @@ let solveFor day : SolvePuzzle option =
     | 10 -> Some DayTen.solve
     | 11 -> Some DayEleven.solve
     | 12 -> Some DayTwelfth.solve
+    | 13 -> Some DayThirteen.solve
     | _ -> None
 
 let solvePuzzle (puzzle: DailyPuzzle) =

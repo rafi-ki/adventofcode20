@@ -826,3 +826,9 @@ module DayTwelfth =
     let solve puzzle =
         let instructions = parseInstructions puzzle.Lines
         if puzzle.Part = 1 then solve1 instructions else solve2 instructions
+
+module DayThirteen =
+    open CommonTypes
+
+    let solve puzzle =
+        if puzzle.Part = 1 then "1" else "2"
