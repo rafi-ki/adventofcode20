@@ -765,24 +765,23 @@ module DayTwelfth =
         let position = { ship.Position with X = ship.Position.X + xMovement; Y = ship.Position.Y + yMovement }
         { ship with Position = position }
 
-    let turnAround waypoint =
-        { X = (-1) * waypoint.X; Y = (-1) * waypoint.Y }
+    let turnAround waypoint = { X = -1 * waypoint.X; Y = -1 * waypoint.Y }
 
     let turnLeft v ship =
         let waypoint =
             match v with
-            | 90 -> { X = ship.Waypoint.Y; Y = (-1) * ship.Waypoint.X }
+            | 90 -> { X = ship.Waypoint.Y; Y = -1 * ship.Waypoint.X }
             | 180 -> turnAround ship.Waypoint
-            | 270 -> { X = (-1) * ship.Waypoint.Y; Y = ship.Waypoint.X }
+            | 270 -> { X = -1 * ship.Waypoint.Y; Y = ship.Waypoint.X }
             | _ -> failwith "unknown degrees"
         { ship with Waypoint = waypoint }
 
     let turnRight v ship =
         let waypoint =
             match v with
-            | 90 -> { X = (-1) * ship.Waypoint.Y; Y = ship.Waypoint.X }
+            | 90 -> { X = -1 * ship.Waypoint.Y; Y = ship.Waypoint.X }
             | 180 -> turnAround ship.Waypoint
-            | 270 -> { X = ship.Waypoint.Y; Y = (-1) * ship.Waypoint.X }
+            | 270 -> { X = ship.Waypoint.Y; Y = -1 * ship.Waypoint.X }
             | _ -> failwith "unknown degrees"
         { ship with Waypoint = waypoint }
 
@@ -830,5 +829,17 @@ module DayTwelfth =
 module DayThirteen =
     open CommonTypes
 
+
+    let solve1 arrival buses =
+
+        "1"
+
+    let noX x = x <> "x"
+
     let solve puzzle =
-        if puzzle.Part = 1 then "1" else "2"
+        let arrival = puzzle.Lines.[0] |> int
+        let buses = puzzle.Lines.[1].Split "," |> Array.filter noX
+        if puzzle.Part = 1 then
+            solve1 arrival buses
+        else
+            "2"
