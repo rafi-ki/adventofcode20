@@ -859,3 +859,9 @@ module DayThirteen =
             solve1 arrival (buses |> Array.map int)
         else
             "2"
+
+module DayFourteen =
+    open CommonTypes
+
+    let solve puzzle =
+        if puzzle.Part = 1 then "1" else "2"
