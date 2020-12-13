@@ -829,10 +829,26 @@ module DayTwelfth =
 module DayThirteen =
     open CommonTypes
 
+    let busArrivalsTillLeaving (arrival: int) original x =
+        if arrival <= x - original then
+            None
+        else
+            Some(x, x + original)
 
-    let solve1 arrival buses =
+    let unfoldBus arrival (busId: int) =
+        let busArrivals = busArrivalsTillLeaving arrival busId
+        Seq.unfold (fun x -> busArrivals x) busId |> Array.ofSeq
 
-        "1"
+    let solve1 (arrival: int) (buses: int[]) =
+        let unfoldBusForArrival = unfoldBus arrival
+        let allBusArrivals =
+            buses |> Array.map unfoldBusForArrival
+        let (busId, firstBusLeavingTime) =
+            allBusArrivals
+            |> Array.map (fun x -> (x.[0], Array.last x))
+            |> Array.minBy (fun (_, last) -> last)
+        let waitingTime = firstBusLeavingTime - arrival
+        waitingTime * busId |> string
 
     let noX x = x <> "x"
 
@@ -840,6 +856,6 @@ module DayThirteen =
         let arrival = puzzle.Lines.[0] |> int
         let buses = puzzle.Lines.[1].Split "," |> Array.filter noX
         if puzzle.Part = 1 then
-            solve1 arrival buses
+            solve1 arrival (buses |> Array.map int)
         else
             "2"

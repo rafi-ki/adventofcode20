@@ -479,4 +479,4 @@ module DayThirteen =
                         "7,13,x,x,59,x,31,19" |]
         }
         let result = DayThirteen.solve puzzle
-        Assert.Equal("1", result)
+        Assert.Equal("295", result)
