@@ -489,8 +489,10 @@ module DayFourteen =
         let puzzle = {
             Day = 14
             Part = 1
-            Lines = [|  "939"
-                        "7,13,x,x,59,x,31,19" |]
+            Lines = [|  "mask = XXXXXXXXXXXXXXXXXXXXXXXXXXXXX1XXXX0X"
+                        "mem[8] = 11"
+                        "mem[7] = 101"
+                        "mem[8] = 0" |]
         }
         let result = DayThirteen.solve puzzle
-        Assert.Equal("295", result)
+        Assert.Equal("165", result)
