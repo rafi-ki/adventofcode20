@@ -862,6 +862,13 @@ module DayThirteen =
 
 module DayFourteen =
     open CommonTypes
+    
+    type Bit = One | Zero | None
+    
+    type InitializationProgram = {
+        Memory: int[]
+        Mask: Bit[]
+    }
 
     let solve puzzle =
         if puzzle.Part = 1 then "1" else "2"
