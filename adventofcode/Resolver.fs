@@ -862,13 +862,61 @@ module DayThirteen =
 
 module DayFourteen =
     open CommonTypes
-    
+
     type Bit = One | Zero | None
-    
+
     type InitializationProgram = {
         Memory: int[]
         Mask: Bit[]
     }
 
+    type Instruction =
+        | Mask of Bit[]
+        | WriteOperation of (int*int)
+
+    let charToBit c =
+        match c with
+        | 'X' -> None
+        | '1' -> One
+        | '0' -> Zero
+        | _ -> failwith "unknown char"
+
+    let parseMask (line: string) =
+        let value = line.Split(" = ").[1]
+        value.ToCharArray()
+        |> Array.map charToBit
+        |> Mask
+
+    let parseWriteOperation (line: string) =
+        let split = line.Split(" = ")
+        let index = split.[0].Replace("mask[", "").Replace("]", "") |> int
+        let value = split.[1] |> int
+        WriteOperation (index, value)
+
+    let parseInstruction (x: string) : Instruction =
+        let parse = if x.StartsWith("mask") then parseMask else parseWriteOperation
+        parse x
+
+    let write program index value =
+        program
+
+    let runInstruction instruction program : InitializationProgram =
+        match instruction with
+        | Mask mask -> { program with Mask = mask }
+        | WriteOperation (index, value) -> write program index value
+
+    let solve1 (program: InitializationProgram) instructions =
+        let runCompleteInstructions =
+            instructions
+            |> Array.map (fun x -> runInstruction x)
+            |> Array.reduce (>>)
+        let finalProgram = runCompleteInstructions program
+        "1"
+
     let solve puzzle =
-        if puzzle.Part = 1 then "1" else "2"
+        let program = {
+            Memory = Array.init 64 (fun _ -> 0)
+            Mask = Array.init 64 (fun _ -> None)
+        }
+        let instructions = puzzle.Lines |> Array.map parseInstruction
+        if puzzle.Part = 1 then solve1 program instructions else "2"
