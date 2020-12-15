@@ -1,6 +1,7 @@
 ﻿module adventofcode20.Resolver
 
 open System
+open System.Collections
 open System.Collections.Generic
 open System.Text.RegularExpressions
 
@@ -866,13 +867,13 @@ module DayFourteen =
     type Bit = One | Zero | None
 
     type InitializationProgram = {
-        Memory: int[]
+        Memory: uint64[]
         Mask: Bit[]
     }
 
     type Instruction =
         | Mask of Bit[]
-        | WriteOperation of (int*int)
+        | WriteOperation of (int*uint64)
 
     let charToBit c =
         match c with
@@ -885,19 +886,32 @@ module DayFourteen =
         let value = line.Split(" = ").[1]
         value.ToCharArray()
         |> Array.map charToBit
+        |> Array.rev
         |> Mask
 
     let parseWriteOperation (line: string) =
         let split = line.Split(" = ")
-        let index = split.[0].Replace("mask[", "").Replace("]", "") |> int
-        let value = split.[1] |> int
+        let index = split.[0].Replace("mem[", "").Replace("]", "") |> int
+        let value = split.[1] |> uint64
         WriteOperation (index, value)
 
     let parseInstruction (x: string) : Instruction =
         let parse = if x.StartsWith("mask") then parseMask else parseWriteOperation
         parse x
 
-    let write program index value =
+    let write (program: InitializationProgram) (index: int) (value: uint64) =
+        let mask = program.Mask
+        let newValue = BitArray(BitConverter.GetBytes(value))
+        let overrideBit (valueBitArray: BitArray) i bit =
+            match bit with
+            | One -> valueBitArray.Set(i, true)
+            | Zero -> valueBitArray.Set(i, false)
+            | _ -> ()
+        mask |> Array.iteri (fun i x -> overrideBit newValue i x)
+
+        let bytes = Array.init 8 (fun x -> byte 0);
+        newValue.CopyTo(bytes, 0);
+        program.Memory.[index] <- BitConverter.ToUInt64(bytes, 0)
         program
 
     let runInstruction instruction program : InitializationProgram =
@@ -911,11 +925,11 @@ module DayFourteen =
             |> Array.map (fun x -> runInstruction x)
             |> Array.reduce (>>)
         let finalProgram = runCompleteInstructions program
-        "1"
+        finalProgram.Memory |> Array.sum |> string
 
     let solve puzzle =
         let program = {
-            Memory = Array.init 64 (fun _ -> 0)
+            Memory = Array.init 100000 (fun _ -> 0UL)
             Mask = Array.init 64 (fun _ -> None)
         }
         let instructions = puzzle.Lines |> Array.map parseInstruction

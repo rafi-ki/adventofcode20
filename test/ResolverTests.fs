@@ -494,5 +494,5 @@ module DayFourteen =
                         "mem[7] = 101"
                         "mem[8] = 0" |]
         }
-        let result = DayThirteen.solve puzzle
+        let result = DayFourteen.solve puzzle
         Assert.Equal("165", result)
