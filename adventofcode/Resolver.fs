@@ -934,3 +934,25 @@ module DayFourteen =
         }
         let instructions = puzzle.Lines |> Array.map parseInstruction
         if puzzle.Part = 1 then solve1 program instructions else "2"
+
+module DayFifteen =
+    open CommonTypes
+
+    let turn i (turns: int[]) =
+        let lastValue = turns.[i-1]
+        let existing = turns |> Array.filter (fun x -> x = lastValue)
+        if existing.Length = 1 || existing.Length = 0 then
+            0
+        else
+
+        1
+
+    let solve1 init =
+        let turns = Array.init 2020 (fun x -> 0)
+        init |> Array.iteri (fun i x -> turns.[i] <- x)
+        let turn = init.Length
+        turn |> string
+
+    let solve puzzle =
+        let initValues = puzzle.Lines.[0].Split "," |> Array.map int
+        if puzzle.Part = 1 then solve1 initValues else "2"

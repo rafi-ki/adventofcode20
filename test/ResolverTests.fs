@@ -496,3 +496,15 @@ module DayFourteen =
         }
         let result = DayFourteen.solve puzzle
         Assert.Equal("165", result)
+
+module DayFifteen =
+
+    [<Fact>]
+    let ``solve example part one``() =
+        let puzzle = {
+            Day = 15
+            Part = 1
+            Lines = [| "0,3,6" |]
+        }
+        let result = DayFifteen.solve puzzle
+        Assert.Equal("436", result)
